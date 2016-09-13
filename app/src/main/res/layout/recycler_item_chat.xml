@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:padding="@dimen/activity_horizontal_margin"
+    android:id="@+id/recycler_item_rl_general"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <TextView
+        android:id="@+id/recycler_item_tv_sender_name"
+        android:text="Name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:textStyle="bold"
+        android:textColor="#3840d7" />
+
+    <TextView
+        android:id="@+id/recycler_item_tv_message_text"
+        android:text="Что-то там и там и тут и туда и сюда и не там и не туда. Ну вообщем как-то так"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#000000" />
+
+    <TextView
+        android:id="@+id/recycler_item_tv_time"
+        android:text="Time: 20:18"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right" />
+
+</LinearLayout>
