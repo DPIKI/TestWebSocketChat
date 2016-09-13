@@ -1,9 +1,15 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.neenbedankt.android-apt'
+apply plugin: 'me.tatarka.retrolambda'
 
 android {
     compileSdkVersion 24
     buildToolsVersion "24.0.1"
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
 
     defaultConfig {
         applicationId "dis.testwebsocketchat"
@@ -18,6 +24,18 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    retrolambda {
+        jdk 'C:\\Program Files\\Java\\jdk1.8.0_101'
+        oldJdk 'C:\\Program Files\\Java\\jdk1.7.0_79'
+        javaVersion JavaVersion.VERSION_1_7
+        defaultMethods false
+        incremental true
+    }
+}
+
+repositories {
+    mavenCentral();
 }
 
 dependencies {
@@ -29,4 +47,6 @@ dependencies {
     apt 'com.google.dagger:dagger-compiler:2.5'
     compile 'com.google.dagger:dagger:2.5'
     provided 'javax.annotation:jsr250-api:1.0'
+    compile 'org.greenrobot:eventbus:3.0.0'
+
 }
