@@ -8,25 +8,29 @@
 
     <TextView
         android:id="@+id/recycler_item_tv_sender_name"
-        android:text="Name"
+        android:text="Гоша"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:padding="3dp"
         android:singleLine="true"
+        android:textSize="14dp"
         android:textStyle="bold"
         android:textColor="#3840d7" />
 
     <TextView
         android:id="@+id/recycler_item_tv_message_text"
-        android:text="Что-то там и там и тут и туда и сюда и не там и не туда. Ну вообщем как-то так"
+        android:text="Тестовое сообщение должно отобразиться нормально, \n черным цветом, \n в три строки."
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:padding="1dp"
         android:textColor="#000000" />
 
     <TextView
         android:id="@+id/recycler_item_tv_time"
-        android:text="Time: 20:18"
+        android:text="20:18"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:padding="1dp"
         android:layout_gravity="right" />
 
 </LinearLayout>
