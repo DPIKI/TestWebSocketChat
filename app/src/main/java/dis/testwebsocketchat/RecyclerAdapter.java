@@ -12,24 +12,23 @@ import java.util.List;
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> {
 
     public List<RecyclerAdapterMessage> mData;
-    private OnViewClickListener mItemClickListener;
-
-    public RecyclerAdapter (OnViewClickListener listener) {
-        mItemClickListener = listener;
-    }
 
     public void update(List<RecyclerAdapterMessage> messages) {
         mData = messages;
         this.notifyDataSetChanged();
     }
 
+    public void addMessage(RecyclerAdapterMessage message) {
+        mData.add(message);
+        this.notifyItemInserted(mData.size() - 1);
+    }
+
     @Override
-    public RecyclerAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
-                                                         int viewType) {
+    public RecyclerAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.recycler_item_chat, parent, false);
 
-        return new ViewHolder(v, mItemClickListener);
+        return new ViewHolder(v);
     }
 
     @Override
@@ -52,36 +51,19 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         }
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder
-            implements View.OnClickListener {
-        public LinearLayout llGeneral;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView tvSenderName;
         public TextView tvMessageText;
         public TextView tvTime;
         public RecyclerAdapterMessage message;
 
-        OnViewClickListener listener;
-
-        public ViewHolder(View v, OnViewClickListener listener) {
+        public ViewHolder(View v) {
             super(v);
-            this.listener = listener;
             message = null;
             tvSenderName = (TextView) v.findViewById(R.id.recycler_item_tv_sender_name);
             tvMessageText = (TextView) v.findViewById(R.id.recycler_item_tv_message_text);
             tvTime = (TextView) v.findViewById(R.id.recycler_item_tv_time);
-            llGeneral = (LinearLayout) v.findViewById(R.id.recycler_item_rl_general);
-            llGeneral.setOnClickListener(this);
-        }
-
-        @Override
-        public void onClick(View v) {
-            this.listener.onViewClicked(message, getAdapterPosition());
         }
     }
-
-    public interface OnViewClickListener {
-        void onViewClicked(RecyclerAdapterMessage message, int position);
-    }
-
 }
 

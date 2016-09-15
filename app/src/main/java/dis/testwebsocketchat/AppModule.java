@@ -40,4 +40,10 @@ public class AppModule {
     public EventBus eventBus() {
         return new EventBus();
     }
+
+    @Provides
+    @Singleton
+    public PrefManager prefManager(Context context) {
+        return new PrefManager(context);
+    }
 }

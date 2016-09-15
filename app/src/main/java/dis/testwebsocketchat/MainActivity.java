@@ -1,18 +1,21 @@
 package dis.testwebsocketchat;
 
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.BinderThread;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.widget.CheckBox;
-import android.widget.Toast;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import javax.inject.Inject;
 
@@ -27,11 +30,24 @@ public class MainActivity extends AppCompatActivity {
     @Inject
     NetworkManager networkManager;
 
-    @BindView(R.id.checkbox)
-    CheckBox checkBox;
+    @Inject
+    PrefManager prefManager;
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
+
+    @BindView(R.id.activity_main_btn_send)
+    ImageButton btnSend;
+
+    @BindView(R.id.activity_main_edit_message)
+    EditText editMessage;
+
+    @BindView(R.id.chat_username_text_view)
+    TextView tvUserName;
+
+    RecyclerAdapter mAdapter;
+
+    AlertDialog editUserNameDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,41 +55,49 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         App.app().inject(this);
+
         ButterKnife.bind(this);
+
+        eventBus.register(this);
 
         setSupportActionBar(toolbar);
 
-        updateView();
-    }
-
-    void updateView() {
-        if (networkManager.sendMessage("Username", "Message")) {
-            Toast.makeText(MainActivity.this, "Good", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(MainActivity.this, "Bad", Toast.LENGTH_SHORT).show();
-        }
-
-        checkBox.setChecked(networkManager.isConnected());
-
-        new Handler(Looper.getMainLooper()).postDelayed(this::updateView, 1000);
-    }
-
-    void initRecyclerView() {
-        RecyclerAdapter recyclerAdapter = new RecyclerAdapter(new ItemClickListener());
+        mAdapter = new RecyclerAdapter();
         RecyclerView recyclerView = new RecyclerView(this);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(recyclerAdapter);
+        recyclerView.setAdapter(mAdapter);
+
+        tvUserName.setText(prefManager.getUserName());
+        btnSend.setOnClickListener(view -> send());
+
+        EditText editText = new EditText(this);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT);
+        editText.setLayoutParams(lp);
+        new AlertDialog.Builder(this)
+                .setTitle("Enter username")
+                .setView(editText)
+                .setPositiveButton("OK", (d, b) -> {});
     }
 
-    public class ItemClickListener implements RecyclerAdapter.OnViewClickListener {
-        @Override
-        public void onViewClicked(RecyclerAdapterMessage m, int position) {
-            if (m == null)
-                return;
-        }
+    private void send() {
+        networkManager.sendMessage(prefManager.getUserName(), editMessage.getText().toString());
     }
 
+    @Subscribe
+    public void onNewMessageEvent(NewMessageEvent event) {
+        if (event == null)
+            return;
 
+        RecyclerAdapterMessage message = new RecyclerAdapterMessage(
+                event.user,
+                event.message,
+                event.time
+        );
+
+        mAdapter.addMessage(message);
+    }
 }

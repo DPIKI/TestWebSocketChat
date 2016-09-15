@@ -7,7 +7,6 @@
 
     <include layout="@layout/toolbar"/>
 
-<<<<<<< HEAD
     <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:visibility="visible"
@@ -16,11 +15,30 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context="MainActivity" />
-=======
-    <CheckBox
-        android:id="@+id/checkbox"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
->>>>>>> 921e35eb35e70825b2797f213500457940168871
 
+    <RelativeLayout
+        android:layout_alignParentBottom="true"
+        android:background="@color/colorPrimary"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageButton
+            android:id="@+id/activity_main_btn_send"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_margin="5dp"
+            android:background="@android:drawable/ic_menu_send"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <EditText
+            android:id="@+id/activity_main_edit_message"
+            android:layout_toStartOf="@id/activity_main_btn_send"
+            android:layout_toLeftOf="@id/activity_main_btn_send"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </RelativeLayout>
 </RelativeLayout>
