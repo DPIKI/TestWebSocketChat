@@ -31,7 +31,7 @@ public class AppModule {
     @Singleton
     public NetworkManager networkManager(Context context, EventBus eventBus) {
         NetworkManager networkManager = new NetworkManager(context, eventBus);
-        networkManager.connect();
+        //networkManager.connect();
         return networkManager;
     }
 

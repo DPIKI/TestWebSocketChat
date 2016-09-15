@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.neovisionaries.ws.client.WebSocket;
@@ -39,7 +40,10 @@ public class NetworkManager {
 
     private Handler mHandler;
 
+    private Context mContext;
+
     public NetworkManager(Context context, EventBus eventBus) {
+        this.mContext = context;
         this.mEventBus = eventBus;
         this.mHandler = new Handler(Looper.getMainLooper());
         context.bindService(
@@ -55,7 +59,7 @@ public class NetworkManager {
         try {
             mSocket = new WebSocketFactory()
                     .setConnectionTimeout(3000)
-                    .createSocket("ws://192.168.1.109:2016")
+                    .createSocket("ws://192.168.1.21:9090")
                     .addListener(new SocketListener())
                     .connectAsynchronously();
         } catch (IOException e) {
@@ -119,6 +123,7 @@ public class NetworkManager {
     }
 
     private void reconnect() {
+        Toast.makeText(mContext, "reconnect", Toast.LENGTH_SHORT).show();
         disconnect();
         connect();
     }
@@ -128,6 +133,7 @@ public class NetworkManager {
         public void onTextMessage(WebSocket websocket, String text) {
             mHandler.post(() -> {
                 try {
+                    Toast.makeText(mContext, "Text Message: " + text, Toast.LENGTH_SHORT).show();
                     JSONObject o = new JSONObject(text);
 
                     if (!o.has("type")) {
