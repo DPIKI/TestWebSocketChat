@@ -7,6 +7,7 @@
 
     <include layout="@layout/toolbar"/>
 
+<<<<<<< HEAD
     <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:visibility="visible"
@@ -15,5 +16,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context="MainActivity" />
+=======
+    <CheckBox
+        android:id="@+id/checkbox"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+>>>>>>> 921e35eb35e70825b2797f213500457940168871
 
 </RelativeLayout>
