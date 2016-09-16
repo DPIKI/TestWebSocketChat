@@ -1,5 +1,6 @@
 package dis.testwebsocketchat;
 
+import android.app.VoiceInteractor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -9,24 +10,20 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.neovisionaries.ws.client.WebSocket;
-import com.neovisionaries.ws.client.WebSocketAdapter;
-import com.neovisionaries.ws.client.WebSocketException;
-import com.neovisionaries.ws.client.WebSocketFactory;
-import com.neovisionaries.ws.client.WebSocketFrame;
+import com.github.nkzawa.socketio.client.IO;
+import com.github.nkzawa.socketio.client.Socket;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import java.net.URISyntaxException;
 
 import javax.inject.Inject;
 
@@ -35,6 +32,7 @@ import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = "Main activity";
     @Inject
     EventBus eventBus;
 
@@ -91,44 +89,24 @@ public class MainActivity extends AppCompatActivity {
         new AlertDialog.Builder(this)
                 .setTitle("Enter username")
                 .setView(editText)
-                .setPositiveButton("OK", (d, b) -> {});
+                .setPositiveButton("OK", (d, b) -> {
+                });
+
+        RecyclerAdapterMessage message = new RecyclerAdapterMessage(
+                "username",
+                "message",
+                "time"
+        );
+
+        mAdapter.addMessage(message);
+        mAdapter.addMessage(message);
+        mAdapter.addMessage(message);
+        mAdapter.addMessage(message);
+        mAdapter.addMessage(message);
     }
 
     private void send() {
-        try {
-            WebSocket socket = new WebSocketFactory()
-                    .setConnectionTimeout(3000)
-                    .createSocket("ws://192.168.1.21:9090")
-                    .addListener(new WebSocketAdapter() {
-                        @Override
-                        public void onConnected(WebSocket websocket, Map<String, List<String>> headers) throws Exception {
-                            super.onConnected(websocket, headers);
-                            Toast.makeText(MainActivity.this, "connected", Toast.LENGTH_SHORT).show();
-                        }
-
-                        @Override
-                        public void onTextMessage(WebSocket websocket, String text) throws Exception {
-                            super.onTextMessage(websocket, text);
-                            Toast.makeText(MainActivity.this, "message " + text, Toast.LENGTH_SHORT).show();
-                        }
-
-                        @Override
-                        public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame, boolean closedByServer) throws Exception {
-                            super.onDisconnected(websocket, serverCloseFrame, clientCloseFrame, closedByServer);
-                            Toast.makeText(MainActivity.this, "disconnected", Toast.LENGTH_SHORT).show();
-                        }
-
-                        @Override
-                        public void onError(WebSocket websocket, WebSocketException cause) throws Exception {
-                            super.onError(websocket, cause);
-                            Toast.makeText(MainActivity.this, "error", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-            Toast.makeText(MainActivity.this, "socket made", Toast.LENGTH_SHORT).show();
-        } catch (IOException e) {
-            Toast.makeText(MainActivity.this, "IOException", Toast.LENGTH_SHORT).show();
-        }
-        //networkManager.sendMessage(prefManager.getUserName(), editMessage.getText().toString());
+        networkManager.sendMessage("username", editMessage.getText().toString());
     }
 
     @Subscribe

@@ -7,11 +7,16 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> {
 
     public List<RecyclerAdapterMessage> mData;
+
+    public RecyclerAdapter() {
+        this.mData = new ArrayList<>();
+    }
 
     public void update(List<RecyclerAdapterMessage> messages) {
         mData = messages;
@@ -20,7 +25,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
     public void addMessage(RecyclerAdapterMessage message) {
         mData.add(message);
-        this.notifyItemInserted(mData.size() - 1);
+        this.notifyDataSetChanged();
     }
 
     @Override

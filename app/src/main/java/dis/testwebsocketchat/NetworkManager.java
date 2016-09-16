@@ -8,22 +8,13 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.neovisionaries.ws.client.WebSocket;
-import com.neovisionaries.ws.client.WebSocketAdapter;
-import com.neovisionaries.ws.client.WebSocketException;
-import com.neovisionaries.ws.client.WebSocketFactory;
-import com.neovisionaries.ws.client.WebSocketFrame;
+import com.github.nkzawa.socketio.client.IO;
+import com.github.nkzawa.socketio.client.Socket;
 
 import org.greenrobot.eventbus.EventBus;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.net.URISyntaxException;
 
 /**
  * Created by Lenovo on 13.09.2016.
@@ -34,7 +25,7 @@ public class NetworkManager {
 
     private EventBus mEventBus;
 
-    private WebSocket mSocket;
+    private Socket mSocket;
 
     private ConnectionNotifierService mService;
 
@@ -49,123 +40,90 @@ public class NetworkManager {
         context.bindService(
                 new Intent(context, ConnectionNotifierService.class),
                 new NmServiceConnection(), 0);
+        IO.Options opts = new IO.Options();
+        opts.transports = new String[]{"websocket"};
+        try {
+            mSocket = IO.socket("http://192.168.137.1:3000", opts);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void connect() {
-        if (mSocket != null) {
-            return;
-        }
 
-        try {
-            mSocket = new WebSocketFactory()
-                    .setConnectionTimeout(3000)
-                    .createSocket("ws://192.168.1.21:9090")
-                    .addListener(new SocketListener())
-                    .connectAsynchronously();
-        } catch (IOException e) {
-            new Handler(Looper.getMainLooper()).postDelayed(this::connect, 1000);
-        }
-
-        if (mService != null) {
-            mService.showNotification();
-        }
+        mSocket.on(Socket.EVENT_CONNECT, (objects) -> mHandler.post(() -> onEventConnect(objects)));
+        mSocket.on(Socket.EVENT_CONNECT_ERROR, (objects) -> mHandler.post(() -> onEventConnectError(objects)));
+        mSocket.on(Socket.EVENT_CONNECT_TIMEOUT, (objects) -> mHandler.post(() -> onEventConnectTimeout(objects)));
+        mSocket.on(Socket.EVENT_DISCONNECT, (objects) -> mHandler.post(() -> onEventDisconnect(objects)));
+        mSocket.on(Socket.EVENT_ERROR, (objects) -> mHandler.post(() -> onEventError(objects)));
+        mSocket.on(Socket.EVENT_MESSAGE, (objects) -> mHandler.post(() -> onEventMessage(objects)));
+        mSocket.on(Socket.EVENT_RECONNECT, (objects) -> mHandler.post(() -> onEventReconnect(objects)));
+        mSocket.on(Socket.EVENT_RECONNECT_ATTEMPT, (objects) -> mHandler.post(() -> onEventReconnectAttempt(objects)));
+        mSocket.on(Socket.EVENT_RECONNECT_ERROR, (objects) -> mHandler.post(() -> onEventReconnectError(objects)));
+        mSocket.on(Socket.EVENT_RECONNECT_FAILED, (objects) -> mHandler.post(() -> onEventReconnectFailed(objects)));
+        mSocket.on(Socket.EVENT_RECONNECTING, (objects) -> mHandler.post(() -> onEventReconnecting(objects)));
+        mSocket.connect();
 
     }
 
     public void disconnect() {
-        if (mSocket != null) {
-            mSocket.clearListeners();
-            mSocket.disconnect();
-            mSocket = null;
-        }
-
-        if (mService != null) {
-            mService.hideNotification();
-        }
+        mSocket.off();
+        mSocket.disconnect();
     }
 
     public boolean isConnected() {
-        return mSocket != null && mSocket.isOpen();
+        return false;
     }
 
     public void sendMessage(String username, String message) {
-
-        if (mSocket == null) {
-            Log.d(TAG, "Socket null");
-            return;
-        } else {
-            Log.d(TAG, "Socket not null");
-        }
-
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
-
-            JSONObject body = new JSONObject();
-            body.put("user", username);
-            body.put("message", message);
-            body.put("time", sdf.format(new Date()));
-
-            JSONObject root = new JSONObject();
-            root.put("type", "send");
-            root.put("body", body);
-
-            if (mSocket == null) {
-                Log.d(TAG, "Socket null");
-            } else {
-                Log.d(TAG, "Socket not null");
-            }
-
-            mSocket.sendText(root.toString());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
+        mSocket.send(username + " : " + message);
     }
 
-    private void reconnect() {
-        Toast.makeText(mContext, "reconnect", Toast.LENGTH_SHORT).show();
-        disconnect();
-        connect();
+    private void onEventConnect(Object... objects) {
+        Log.d(TAG, "Connect");
     }
 
-    private class SocketListener extends WebSocketAdapter {
-        @Override
-        public void onTextMessage(WebSocket websocket, String text) {
-            mHandler.post(() -> {
-                try {
-                    Toast.makeText(mContext, "Text Message: " + text, Toast.LENGTH_SHORT).show();
-                    JSONObject o = new JSONObject(text);
+    private void onEventConnectError(Object... objects) {
+        Log.d(TAG, "ConnectError");
+    }
 
-                    if (!o.has("type")) {
-                        return;
-                    }
+    private void onEventConnectTimeout(Object... objects) {
+        Log.d(TAG, "ConnectTimeout");
+    }
 
-                    String type = o.getString("type");
-                    JSONObject body = o.getJSONObject("body");
+    private void onEventDisconnect(Object... objects) {
+        Log.d(TAG, "Disconnect");
+    }
 
-                    if (type.equals("new") || type.equals("received")) {
-                        NewMessageEvent event = new NewMessageEvent(
-                                body.getString("user"),
-                                body.getString("message"),
-                                body.getString("time")
-                        );
-                        mEventBus.post(event);
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            });
-        }
+    private void onEventError(Object... objects) {
+        Log.d(TAG, "Error");
+    }
 
-        @Override
-        public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame, boolean closedByServer) {
-            mHandler.post(NetworkManager.this::reconnect);
-        }
+    private void onEventMessage(Object... objects) {
+        Log.d(TAG, "Message : " + objects[0].toString());
 
-        @Override
-        public void onError(WebSocket websocket, WebSocketException cause) {
-            mHandler.post(NetworkManager.this::reconnect);
-        }
+        NewMessageEvent nme = new NewMessageEvent("", objects[0].toString(), "");
+        mEventBus.post(nme);
+    }
+
+    private void onEventReconnect(Object... objects) {
+        Log.d(TAG, "Reconnect");
+    }
+
+    private void onEventReconnectAttempt(Object... objects) {
+        Log.d(TAG, "ReconnectAttempt");
+    }
+
+    private void onEventReconnectError(Object... objects) {
+        Log.d(TAG, "ReconnectError");
+    }
+
+    private void onEventReconnectFailed(Object... objects) {
+        Log.d(TAG, "ReconnectFailed");
+    }
+
+    private void onEventReconnecting(Object... objects) {
+        Log.d(TAG, "Reconnecting");
     }
 
     private class NmServiceConnection implements ServiceConnection {
