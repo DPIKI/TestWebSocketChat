@@ -19,7 +19,7 @@
 
     <TextView
         android:id="@+id/recycler_item_tv_message_text"
-        android:text="Тестовое сообщение должно отобразиться нормально, \n черным цветом, \n в три строки."
+        android:text="message_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="1dp"

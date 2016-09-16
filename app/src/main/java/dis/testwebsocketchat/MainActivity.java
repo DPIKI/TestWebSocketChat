@@ -42,8 +42,8 @@ public class MainActivity extends AppCompatActivity {
     @Inject
     PrefManager prefManager;
 
-    @BindView(R.id.toolbar)
-    Toolbar toolbar;
+    @BindView(R.id.activity_main_rv)
+    RecyclerView recyclerView;
 
     @BindView(R.id.activity_main_btn_send)
     ImageButton btnSend;
@@ -69,10 +69,11 @@ public class MainActivity extends AppCompatActivity {
 
         eventBus.register(this);
 
+        // TODO: не инициализируется через @BindView.
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         mAdapter = new RecyclerAdapter();
-        RecyclerView recyclerView = new RecyclerView(this);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -92,12 +93,13 @@ public class MainActivity extends AppCompatActivity {
                 .setPositiveButton("OK", (d, b) -> {
                 });
 
-        RecyclerAdapterMessage message = new RecyclerAdapterMessage(
-                "username",
-                "message",
-                "time"
-        );
-
+        RecyclerAdapterMessage message = new RecyclerAdapterMessage("name", "Test message:ansjdknaskdjnajkndkjandkjnakjdnasndkjansdjkanskjdnsadj", "20:16");
+        mAdapter.addMessage(message);
+        mAdapter.addMessage(message);
+        mAdapter.addMessage(message);
+        mAdapter.addMessage(message);
+        mAdapter.addMessage(message);
+        mAdapter.addMessage(message);
         mAdapter.addMessage(message);
         mAdapter.addMessage(message);
         mAdapter.addMessage(message);
@@ -119,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
                 event.message,
                 event.time
         );
-
         mAdapter.addMessage(message);
     }
+
 }

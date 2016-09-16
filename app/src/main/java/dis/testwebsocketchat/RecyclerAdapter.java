@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,11 +19,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         this.mData = new ArrayList<>();
     }
 
-    public void update(List<RecyclerAdapterMessage> messages) {
-        mData = messages;
-        this.notifyDataSetChanged();
-    }
-
     public void addMessage(RecyclerAdapterMessage message) {
         mData.add(message);
         this.notifyDataSetChanged();
@@ -32,7 +28,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     public RecyclerAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.recycler_item_chat, parent, false);
-
         return new ViewHolder(v);
     }
 
@@ -49,11 +44,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
     @Override
     public int getItemCount() {
-        if (mData!= null) {
-            return mData.size();
-        } else {
-            return 0;
-        }
+        return mData != null ? mData.size() : 0;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -69,6 +60,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             tvMessageText = (TextView) v.findViewById(R.id.recycler_item_tv_message_text);
             tvTime = (TextView) v.findViewById(R.id.recycler_item_tv_time);
         }
+
     }
+
 }
 
